@@ -471,6 +471,50 @@ class pawpotcar(object):
 
         return self.paw_nablaij
 
+    def get_rij(self, lforce: bool=False):
+        '''
+        Calculate the quantity
+
+            r_{ij} = < \phi_i^{AE} | r | \phi_j^{AE} > -
+                     < \phi_i^{PS} | r | \phi_j^{PS} >
+
+        where \phi^{AE/PS} are the PAW AE/PS radial wavefunctions.
+        Valid inside the PAW augmentation sphere, where wavefunctions are localized.
+        '''
+
+        if not hasattr(self, 'paw_rij') or lforce:
+            from pysbt import GauntTable
+            rr = self.rgrid
+            self.paw_rij = np.zeros((3, self.lmmax, self.lmmax))
+
+            for ii in range(self.lmmax):
+                for jj in range(self.lmmax):
+                    n1, l1, m1 = self.ilm[ii]
+                    n2, l2, m2 = self.ilm[jj]
+
+                    # Angular part (same as nabla operator)
+                    A = np.sqrt(4 * np.pi / 3) * np.array([
+                        GauntTable(l1, l2, 1, m1, m2, m) for m in [1, -1, 0]
+                    ])
+
+                    if np.allclose(A, 0):
+                        continue
+
+                    # Radial integrals of r_{ij}
+                    R_ae = self.radial_simp_int(
+                        self.paw_ae_wfc[n1] * self.paw_ae_wfc[n2] * rr**3
+                    )
+                    R_ps = self.radial_simp_int(
+                        self.paw_ps_wfc[n1] * self.paw_ps_wfc[n2] * rr**3
+                    )
+
+                    R = R_ae - R_ps
+
+                    self.paw_rij[:, ii, jj] = R * A
+
+        return self.paw_rij
+
+
     def get_Qij(self):
         '''
         Calculate the quantity
