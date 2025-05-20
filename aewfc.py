@@ -252,6 +252,26 @@ class vasp_ae_wfc(object):
 
         return self._nablaijs
 
+    def get_rijs(self):
+        '''
+        Matrix elements of the position operator for all the atoms
+
+            nabla_{ij} = < \phi_i^{AE} | r | \phi_j^{AE} > -
+                         < \phi_i^{PS} | r | \phi_j^{PS} >
+        
+        and stored in a list of scipy.sparse block diagonal matrices.
+        '''
+        if not hasattr(self, "_rijs"):
+            self._rijs = [
+                block_diag([
+                    self._pawpp[self._element_idx[iatom]].get_rij()[ii]
+                    for iatom in range(self._natoms)
+                ])
+                for ii in range(3)
+            ]
+
+        return self._rijs
+
     def get_ae_norm(self, ispin: int=1, iband: int=1):
         '''
         '''
