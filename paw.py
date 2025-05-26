@@ -501,11 +501,12 @@ class pawpotcar(object):
                         continue
 
                     # Radial integrals of r_{ij}
+                    # rr**2 included in the simp_int
                     R_ae = self.radial_simp_int(
-                        self.paw_ae_wfc[n1] * self.paw_ae_wfc[n2] * rr**3
+                        self.paw_ae_wfc[n1] * self.paw_ae_wfc[n2] * rr
                     )
                     R_ps = self.radial_simp_int(
-                        self.paw_ps_wfc[n1] * self.paw_ps_wfc[n2] * rr**3
+                        self.paw_ps_wfc[n1] * self.paw_ps_wfc[n2] * rr
                     )
 
                     R = R_ae - R_ps

@@ -76,7 +76,7 @@ class vasp_ae_wfc(object):
         assert len(self._elem_cnts) == len(self._pawpp), \
             "The kind of elements in POTCAR and POSCAR does not match!"
         if not np.alltrue([
-            self._pawpp[ii].element.split('_')[0] == elements[ii]
+            self._pawpp[ii].element.split('_')[0] == self._elements[ii]
             for ii in range(len(elements))
         ]):
             print(
